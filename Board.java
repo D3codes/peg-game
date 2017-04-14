@@ -23,14 +23,18 @@ class Board {
   }
 
   public boolean wonGame() {
+    if(pegsRemaining() > 1)
+      return false;
+    return true;
+  }
+
+  public int pegsRemaining() {
     int pegs = 0;
     for(int i = 0; i < board.length; i++) {
       if(board[i])
         pegs++;
-      if(pegs > 1)
-        return false;
     }
-    return true;
+    return pegs;
   }
 
   public boolean isOccupied(int index) {
