@@ -13,7 +13,7 @@ class Game {
     console.clearScreen();
     while(true) {
       console.printBoard();
-      moe = console.getMove();
+      move = console.getMove();
       console.clearScreen();
       if(!board.move(move[0], move[1]))
         console.invalidMoveMessage();
