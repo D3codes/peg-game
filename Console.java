@@ -43,13 +43,13 @@ class Console {
   }
 
   public int[] getMove() {
-    int[] inputs = new int[2];
+    int[] move = new int[2];
     System.out.print("Which peg do you want to move?: ");
-    inputs[0] = scanner.nextInt();
+    move[0] = scanner.nextInt();
     System.out.print("Where do you want to move it?: ");
-    inputs[1] = scanner.nextInt();
+    move[1] = scanner.nextInt();
     scanner.nextLine();
-    return inputs;
+    return move;
   }
 
   public void invalidMoveMessage() {

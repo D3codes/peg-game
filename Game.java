@@ -9,13 +9,13 @@ class Game {
   }
 
   public void play() {
-    int[] moves;
+    int[] move;
     console.clearScreen();
     while(true) {
       console.printBoard();
-      moves = console.getMove();
+      moe = console.getMove();
       console.clearScreen();
-      if(!board.move(moves[0], moves[1]))
+      if(!board.move(move[0], move[1]))
         console.invalidMoveMessage();
 
       if(board.wonGame()) {
