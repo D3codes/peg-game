@@ -5,6 +5,9 @@ def getSymbol(peg):
         return '|'
     return 'o'
 
+def println(message):
+    print(message)
+
 def printBoard():
     print("    " + getSymbol(board.isOccupied(0)) + "             0")
     print("   " + getSymbol(board.isOccupied(1)) + " " + getSymbol(board.isOccupied(2)) + "           1  2")
@@ -14,8 +17,8 @@ def printBoard():
 
 def getMove():
     move = [None] * 2
-    move[0] = int(raw_input("Which peg do you want to move? (0-14): "))
-    move[1] = int(raw_input("Where do you want to move it? (0-14): "))
+    move[0] = int(input("Which peg do you want to move? (0-14): "))
+    move[1] = int(input("Where do you want to move it? (0-14): "))
     return move
 
 def invalidMoveMessage():
@@ -31,7 +34,7 @@ def gameOverMessage():
     print("Game Over")
 
 def playAgain():
-    again = raw_input("Play Again? (y/n): ")[0]
+    again = input("Play Again? (y/n): ")[0]
     if again == 'y' or again == 'Y':
         return True
     return False
