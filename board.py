@@ -134,6 +134,11 @@ def middle(start, end):
     return -1;
 
 def canMove(start, end):
+    if start < 0 or start > 14:
+        return False
+    if end <0 or end > 14:
+        return False
+        
     if not board[start] or board[end]:
         return False
     mid = middle(start, end)
