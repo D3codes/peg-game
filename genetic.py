@@ -4,11 +4,11 @@ import console
 import time
 
 cross = 0.7
-mutation = 0.001
+mutation = 0.01
 pop_size = 100
 chromo_length = 104
 gene_length = 4
-max_gens = 400
+max_gens = 3000
 gens = 0
 
 def fitness(population):
@@ -16,14 +16,13 @@ def fitness(population):
         chromosome = population[i]['dna']
         splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
         decoded = [int(byte, 2) for byte in splitUp]
-        for j in range(0, 13):
+        for j in range(0, 13, 2):
             if board.move(decoded[j], decoded[j+1]):
                 population[i]['fitness'] += 1
                 console.printBoard()
-            j += 1
         board.setBoard()
         console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']))
-        #time.sleep()
+        #time.sleep(1)
 
 def chooseParent(population):
     maximum = sum([child['fitness'] for child in population])
@@ -31,7 +30,7 @@ def chooseParent(population):
     current = 0
     for child in population:
         current += child['fitness']
-        if current > pick:
+        if current >= pick:
             return child['dna']
 
 def crossover(a, b):
@@ -40,33 +39,20 @@ def crossover(a, b):
         gene = int(random.uniform(0, length))
         new_a = a[:gene] + b[gene:]
         new_b = b[:gene] + a[gene:]
-        splitUp_a = [a[i:i+4] for i in range(0, len(a), 4)]
-        splitUp_b = [b[i:i+4] for i in range(0, len(b), 4)]
-        decoded_a = [int(byte, 2) for byte in splitUp_a]
-        decoded_b = [int(byte, 2) for byte in splitUp_b]
-        splitUp_aNew = [new_a[i:i+4] for i in range(0, len(new_a), 4)]
-        splitUp_bNew = [new_b[i:i+4] for i in range(0, len(new_b), 4)]
-        decoded_aNew = [int(byte, 2) for byte in splitUp_aNew]
-        decoded_bNew = [int(byte, 2) for byte in splitUp_bNew]
-        print("Gene: " + str(gene))
-        print("Old a: ",end='')
-        print(decoded_a, end='')
-        print(" | New a: ", end='')
-        print(decoded_aNew)
-        print("Old b: ", end='')
-        print(decoded_b, end='')
-        print(" | New b: ", end='')
-        print(decoded_bNew)
-        a = new_a
-        b = new_b
+        return[new_a, new_b]
+    return[a, b]
 
 def mutate(dna):
+    new_dna = ""
     for bit in dna:
         if random.uniform(0, 1) <= mutation:
             if bit == '0':
-                bit = '1'
+                new_dna += '1'
             else:
-                bit = '0'
+                new_dna += '0'
+        else:
+            new_dna += bit
+    return new_dna
 
 def randomBits(length):
     bits = ""
@@ -88,19 +74,20 @@ while not found:
         if child['fitness'] == 13:
             found = True
             break
+
     temp = [None] * pop_size
-    cPop = 0
-    while cPop < pop_size:
+    for i in range(0, pop_size, 2):
         offspring1 = chooseParent(population)
         offspring2 = chooseParent(population)
-        crossover(offspring1, offspring2)
-        mutate(offspring1)
-        mutate(offspring2)
-        temp[cPop] = {'dna': offspring1, 'fitness': 0}
-        cPop += 1
-        temp[cPop] = {'dna': offspring2, 'fitness': 0}
-        cPop += 1
-    population = temp
+        crsovr = crossover(offspring1, offspring2)
+        offspring1 = crsovr[0]
+        offspring2 = crsovr[1]
+        offspring1 = mutate(offspring1)
+        offspring2 = mutate(offspring2)
+        temp[i] = {'dna': offspring1, 'fitness': 0}
+        temp[i+1] = {'dna': offspring2, 'fitness': 0}
+    for i in range(0, len(temp)):
+        population[i] = temp[i]
     gens += 1
     if gens > max_gens:
         console.println("No solution found this run")
