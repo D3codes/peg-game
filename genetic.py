@@ -8,7 +8,7 @@ mutation = 0.01
 pop_size = 250
 chromo_length = 104
 gene_length = 4
-max_gens = 100000
+max_gens = 1000
 gens = 0
 
 def replayBest(chromosome):
@@ -77,35 +77,48 @@ def randomBits(length):
             bits += '0'
     return bits
 
-population = [None] * pop_size
-for i in range(0, pop_size):
-    population[i] = {'dna': randomBits(chromo_length), 'fitness': 0, 'won': False}
-gens = 0
-best_chromosome = population[0]
-found = False
-while not found:
-    best_chromosome = fitness(population, best_chromosome)
-    for child in population:
-        if child['won']:
-            found = True
+attempt = 0
+while True:
+    print("Attempt #" + str(attempt))
+
+    population = [None] * pop_size
+    for i in range(0, pop_size):
+        population[i] = {'dna': randomBits(chromo_length), 'fitness': 0, 'won': False}
+    gens = 0
+    best_chromosome = population[0]
+    found = False
+
+    while not found:
+        best_chromosome = fitness(population, best_chromosome)
+        for child in population:
+            if child['won']:
+                found = True
+                break
+
+        temp = [None] * pop_size
+        for i in range(0, pop_size, 2):
+            offspring1 = chooseParent(population)
+            offspring2 = chooseParent(population)
+            crsovr = crossover(offspring1, offspring2)
+            offspring1 = crsovr[0]
+            offspring2 = crsovr[1]
+            offspring1 = mutate(offspring1)
+            offspring2 = mutate(offspring2)
+            temp[i] = {'dna': offspring1, 'fitness': 0, 'won': False}
+            temp[i+1] = {'dna': offspring2, 'fitness': 0, 'won': False}
+        for i in range(0, pop_size):
+            population[i] = temp[i]
+
+        gens += 1
+        if gens > max_gens:
+            console.println("No solution found this run")
+            console.println("Max fitness for this run: " + str(best_chromosome['fitness']))
+            replayBest(best_chromosome['dna'])
             break
 
-    temp = [None] * pop_size
-    for i in range(0, pop_size, 2):
-        offspring1 = chooseParent(population)
-        offspring2 = chooseParent(population)
-        crsovr = crossover(offspring1, offspring2)
-        offspring1 = crsovr[0]
-        offspring2 = crsovr[1]
-        offspring1 = mutate(offspring1)
-        offspring2 = mutate(offspring2)
-        temp[i] = {'dna': offspring1, 'fitness': 0, 'won': False}
-        temp[i+1] = {'dna': offspring2, 'fitness': 0, 'won': False}
-    for i in range(0, len(temp)):
-        population[i] = temp[i]
-    gens += 1
-    if gens > max_gens:
-        console.println("No solution found this run")
-        console.println("Max fitness for this run: " + str(best_chromosome['fitness']))
-        replayBest(best_chromosome['dna'])
-        found = True
+    if found:
+        break
+    if input("Again? : ")[0].upper() == 'Y':
+        attempt += 1
+    else:
+        break
