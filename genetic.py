@@ -2,27 +2,56 @@ import random
 import board
 import console
 import time
+import window
 
-cross = 0.7
-mutation = 0.002
-pop_size = 100
+cross = 0.6
+mutation = 0.01
+pop_size = 250
 chromo_length = 104
 gene_length = 4
-max_gens = 5000
+max_gens = 1000
 gens = 0
+DISPLAY_WINDOW = True
 
-def fitness(population):
+if DISPLAY_WINDOW:
+    window.createWindow()
+
+def replayBest(chromosome):
+    splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
+    decoded = [int(byte, 2) for byte in splitUp]
+    for j in range(0, 13, 2):
+        if board.move(decoded[j], decoded[j+1]):
+            console.printBoard()
+    board.setBoard()
+
+def fitness(population, bestChromo):
+    didMove = True
     for i in range(0, len(population)):
+        if didMove and DISPLAY_WINDOW:
+            window.drawBoard()
+
         chromosome = population[i]['dna']
         splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
         decoded = [int(byte, 2) for byte in splitUp]
         for j in range(0, 13, 2):
-            if board.move(decoded[j], decoded[j+1]):
-                population[i]['fitness'] += 1
-                console.printBoard()
+            start = decoded[j]
+            end = decoded[j+1]
+            middle = board.middle(start, end)
+            didMove = board.move(start, end)
+            if didMove:
+                population[i]['fitness'] += 104 - j
+                if population[i]['fitness'] > bestChromo['fitness']:
+                    bestChromo = population[i]
+                if DISPLAY_WINDOW:
+                    window.fillPeg(start)
+                    window.fillPeg(end)
+                    window.fillPeg(middle)
+        if board.wonGame():
+            chromosome['won'] = True
         board.setBoard()
         console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']))
-        #time.sleep(0.5)
+        #time.sleep(0.1)
+    return bestChromo
 
 def chooseParent(population):
     maximum = sum([child['fitness'] for child in population])
@@ -69,15 +98,15 @@ while True:
 
     population = [None] * pop_size
     for i in range(0, pop_size):
-        population[i] = {'dna': randomBits(chromo_length), 'fitness': 0}
+        population[i] = {'dna': randomBits(chromo_length), 'fitness': 0, 'won': False}
     gens = 0
+    best_chromosome = population[0]
     found = False
 
     while not found:
-        fitness(population)
+        best_chromosome = fitness(population, best_chromosome)
         for child in population:
-            if child['fitness'] == 13:
-                console.println("Found solution: " + child['dna'])
+            if child['won']:
                 found = True
                 break
 
@@ -90,16 +119,21 @@ while True:
             offspring2 = crsovr[1]
             offspring1 = mutate(offspring1)
             offspring2 = mutate(offspring2)
-            temp[i] = {'dna': offspring1, 'fitness': 0}
-            temp[i+1] = {'dna': offspring2, 'fitness': 0}
+            temp[i] = {'dna': offspring1, 'fitness': 0, 'won': False}
+            temp[i+1] = {'dna': offspring2, 'fitness': 0, 'won': False}
         for i in range(0, pop_size):
             population[i] = temp[i]
 
         gens += 1
         if gens > max_gens:
             console.println("No solution found this run")
+            console.println("Max fitness for this run: " + str(best_chromosome['fitness']))
+            replayBest(best_chromosome['dna'])
             break
 
     if found:
         break
-    attempt += 1
+    if input("Again? : ")[0].upper() == 'Y':
+        attempt += 1
+    else:
+        break
