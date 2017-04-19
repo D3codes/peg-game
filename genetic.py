@@ -2,6 +2,7 @@ import random
 import board
 import console
 import time
+import window
 
 cross = 0.6
 mutation = 0.01
@@ -10,6 +11,10 @@ chromo_length = 104
 gene_length = 4
 max_gens = 1000
 gens = 0
+DISPLAY_WINDOW = True
+
+if DISPLAY_WINDOW:
+    window.createWindow()
 
 def replayBest(chromosome):
     splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
@@ -19,9 +24,11 @@ def replayBest(chromosome):
             console.printBoard()
     board.setBoard()
 
-
 def fitness(population, bestChromo):
+    didMove = True
     for i in range(0, len(population)):
+        if didMove and DISPLAY_WINDOW:
+            window.drawBoard()
         chromosome = population[i]['dna']
         splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
         decoded = [int(byte, 2) for byte in splitUp]
@@ -33,6 +40,16 @@ def fitness(population, bestChromo):
                 console.printBoard()
         if board.wonGame():
             chromosome['won'] = True
+            start = decoded[j]
+            end = decoded[j+1]
+            middle = board.middle(start, end)
+            didMove = board.move(start, end)
+            if didMove:
+                population[i]['fitness'] += 1
+                if DISPLAY_WINDOW:
+                    window.fillPeg(start)
+                    window.fillPeg(end)
+                    window.fillPeg(middle)
         board.setBoard()
         console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']))
         #time.sleep(0.1)

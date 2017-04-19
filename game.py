@@ -1,10 +1,11 @@
 import board
 import console
+import window
 
 move = []
 console.clearScreen()
 while True:
-    console.printBoard()
+    window.drawBoard(board.board)
     move = console.getMove()
     console.clearScreen()
     if not board.move(move[0], move[1]):
