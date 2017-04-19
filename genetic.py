@@ -29,27 +29,25 @@ def fitness(population, bestChromo):
     for i in range(0, len(population)):
         if didMove and DISPLAY_WINDOW:
             window.drawBoard()
+
         chromosome = population[i]['dna']
         splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
         decoded = [int(byte, 2) for byte in splitUp]
         for j in range(0, 13, 2):
-            if board.move(decoded[j], decoded[j+1]):
-                population[i]['fitness'] += 104 - j
-                if population[i]['fitness'] > bestChromo['fitness']:
-                    bestChromo = population[i]
-                console.printBoard()
-        if board.wonGame():
-            chromosome['won'] = True
             start = decoded[j]
             end = decoded[j+1]
             middle = board.middle(start, end)
             didMove = board.move(start, end)
             if didMove:
-                population[i]['fitness'] += 1
+                population[i]['fitness'] += 104 - j
+                if population[i]['fitness'] > bestChromo['fitness']:
+                    bestChromo = population[i]
                 if DISPLAY_WINDOW:
                     window.fillPeg(start)
                     window.fillPeg(end)
                     window.fillPeg(middle)
+        if board.wonGame():
+            chromosome['won'] = True
         board.setBoard()
         console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']))
         #time.sleep(0.1)
