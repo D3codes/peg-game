@@ -10,8 +10,9 @@ x = 0
 
 pegs = []
 labels = []
+texts = []
 
-win = GraphWin("Peg", 500, 300)
+win = GraphWin("Peg", 500, 350)
 for i in range(0, 15):
     pt = Point(x_values[i], y_values[i])
     pegs.append(Circle(pt, PEG_RADIUS))
@@ -35,3 +36,8 @@ def drawBoard():
 def drawLabel(label):
     labels[label].undraw()
     labels[label].draw(win)
+
+def printText(text, pos):
+    texts.append(Text(Point(pos['x'], pos['y']), text))
+    texts[text].undraw()
+    texts[text].draw(win)

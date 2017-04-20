@@ -6,20 +6,37 @@ import window
 
 cross = 0.6
 mutation = 0.01
-pop_size = 100
+pop_size = 96
 chromo_length = 416
-max_gens = 4000
+max_gens = 6000
 DISPLAY_WINDOW = False
 
 gens = 0
 gene_length = 4
 numberOfMoves = int(chromo_length/gene_length)
 MAX_FITNESS = 0
+SUCCESSES = 0
+successful_chromos = []
+
 for i in range(0, 13):
     MAX_FITNESS += (numberOfMoves * numberOfMoves + 1) + (i * i)
 
 if DISPLAY_WINDOW:
     window.createWindow()
+
+def saveSuccesses():
+    target = open("successes.txt", 'a')
+    target.truncate()
+    for dna in successful_chromos:
+        target.write(str(dna))
+    target.close()
+
+def readSuccesses():
+    target = open("successes.txt", 'r')
+    target.truncate()
+    for line in target:
+        successful_chromos.append(line)
+    target.close()
 
 def replayBest(chromosome):
     splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
@@ -27,7 +44,7 @@ def replayBest(chromosome):
     for j in range(0, int(chromo_length/gene_length), 2):
         if board.move(decoded[j], decoded[j+1]):
             window.drawBoard()
-            time.sleep(1)
+            time.sleep(0.6)
     board.setBoard()
 
 def fitness(population, bestChromo):
@@ -55,10 +72,10 @@ def fitness(population, bestChromo):
 
         if board.wonGame():
             population[i]['won'] = True
+            successful_chromos.append(population[i]['dna'])
 
         board.setBoard()
-        console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']) + "/" + str(MAX_FITNESS))
-        #time.sleep(0.1)
+        #console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']) + "/" + str(MAX_FITNESS))
     return bestChromo
 
 def chooseParent(population):
@@ -100,7 +117,7 @@ def randomBits(length):
             bits += '0'
     return bits
 
-attempt = 0
+attempt = 1
 while True:
     print("Attempt #" + str(attempt))
 
@@ -134,15 +151,19 @@ while True:
 
         gens += 1
         if gens > max_gens:
-            console.println("No solution found this run")
-            console.println("Max fitness for this run: " + str(best_chromosome['fitness']))
+            console.println("\tNo solution found this run")
+            console.println("\tMax fitness for this run: " + str(best_chromosome['fitness']) + '/' + str(MAX_FITNESS))
             replayBest(best_chromosome['dna'])
             break
 
     if found:
         replayBest(best_chromosome['dna'])
+        SUCCESSES += 1
         break
     #if input("Again? : ")[0].upper() == 'Y':
-    #    attempt += 1
+    attempt += 1
+    console.println("\tSuccesses: " + str(SUCCESSES))
     #else:
     #    break
+console.println("Saving successes")
+saveSuccesses()
