@@ -6,12 +6,17 @@ import window
 
 cross = 0.6
 mutation = 0.01
-pop_size = 250
-chromo_length = 104
-gene_length = 4
-max_gens = 1000
+pop_size = 100
+chromo_length = 416
+max_gens = 4000
+DISPLAY_WINDOW = False
+
 gens = 0
-DISPLAY_WINDOW = True
+gene_length = 4
+numberOfMoves = int(chromo_length/gene_length)
+MAX_FITNESS = 0
+for i in range(0, 13):
+    MAX_FITNESS += (numberOfMoves * numberOfMoves + 1) + (i * i)
 
 if DISPLAY_WINDOW:
     window.createWindow()
@@ -19,9 +24,10 @@ if DISPLAY_WINDOW:
 def replayBest(chromosome):
     splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
     decoded = [int(byte, 2) for byte in splitUp]
-    for j in range(0, 13, 2):
+    for j in range(0, int(chromo_length/gene_length), 2):
         if board.move(decoded[j], decoded[j+1]):
-            console.printBoard()
+            window.drawBoard()
+            time.sleep(1)
     board.setBoard()
 
 def fitness(population, bestChromo):
@@ -33,23 +39,25 @@ def fitness(population, bestChromo):
         chromosome = population[i]['dna']
         splitUp = [chromosome[j:j+4] for j in range(0, len(chromosome), 4)]
         decoded = [int(byte, 2) for byte in splitUp]
-        for j in range(0, 13, 2):
+        for j in range(0, numberOfMoves, 2):
             start = decoded[j]
             end = decoded[j+1]
             middle = board.middle(start, end)
             didMove = board.move(start, end)
             if didMove:
-                population[i]['fitness'] += 104 - j
+                population[i]['fitness'] += (numberOfMoves * numberOfMoves + 1) - (j * j)
                 if population[i]['fitness'] > bestChromo['fitness']:
                     bestChromo = population[i]
                 if DISPLAY_WINDOW:
                     window.fillPeg(start)
                     window.fillPeg(end)
                     window.fillPeg(middle)
+
         if board.wonGame():
-            chromosome['won'] = True
+            population[i]['won'] = True
+
         board.setBoard()
-        console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']))
+        console.println("Generation: " + str(gens) + " Genome: " + str(i) + " Fitness: " + str(population[i]['fitness']) + "/" + str(MAX_FITNESS))
         #time.sleep(0.1)
     return bestChromo
 
@@ -132,8 +140,9 @@ while True:
             break
 
     if found:
+        replayBest(best_chromosome['dna'])
         break
-    if input("Again? : ")[0].upper() == 'Y':
-        attempt += 1
-    else:
-        break
+    #if input("Again? : ")[0].upper() == 'Y':
+    #    attempt += 1
+    #else:
+    #    break

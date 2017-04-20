@@ -12,16 +12,14 @@ pegs = []
 labels = []
 
 win = GraphWin("Peg", 500, 300)
-
-def createWindow():
-    for i in range(0, 15):
-        pt = Point(x_values[i], y_values[i])
-        pegs.append(Circle(pt, PEG_RADIUS))
-        labels.append(Text(pt, str(i)))
-        labels[i].setTextColor('white')
-        labels[i].setSize(20)
-    for i in range(0, 15):
-        pegs[i].draw(win)
+for i in range(0, 15):
+    pt = Point(x_values[i], y_values[i])
+    pegs.append(Circle(pt, PEG_RADIUS))
+    labels.append(Text(pt, str(i)))
+    labels[i].setTextColor('white')
+    labels[i].setSize(20)
+for i in range(0, 15):
+    pegs[i].draw(win)
 
 def fillPeg(peg):
     if board.isOccupied(peg):
