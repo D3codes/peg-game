@@ -3,11 +3,12 @@ import board
 import console
 import time
 import window
+from random import shuffle
 
 cross = 0.6
-mutation = 0.01
+mutation = 0.015
 pop_size = 100
-chromo_length = 416
+chromo_length = 520
 max_gens = 4000
 DISPLAY_WINDOW = False
 
@@ -15,7 +16,6 @@ gens = 0
 gene_length = 4
 numberOfMoves = int(chromo_length/gene_length)
 MAX_FITNESS = 13
-SUCCESSES = 0
 successful_chromos = []
 
 if DISPLAY_WINDOW:
@@ -94,19 +94,35 @@ def crossover(a, b):
     return[a, b]
 
 def mutate(dna):
-    new_dna = ""
-    for bit in dna:
-        if random.uniform(0, 1) <= mutation:
-            if bit == '0':
-                new_dna += '1'
+    if random.uniform(0, 1) <= 0.3:
+        new_dna = ""
+        for bit in dna:
+            if random.uniform(0, 1) <= mutation:
+                if bit == '0':
+                    new_dna += '1'
+                else:
+                    new_dna += '0'
             else:
-                new_dna += '0'
-        else:
-            new_dna += bit
-    return new_dna
+                new_dna += bit
+        return new_dna
+    else:
+        return scramble(dna)
 
-#def scramble(dna):
-
+def scramble(chromosome):
+    if random.uniform(0, 1) <= mutation:
+        dna = list(chromosome)
+        start = int(random.uniform(0, len(dna) - 1))
+        end = int(random.uniform(start, len(dna)))
+        dna_section = []
+        for i in range(start, end):
+            dna_section.append(dna[i])
+        shuffle(dna_section)
+        dna_counter = 0
+        for i in range(start, end):
+            dna[i] = dna_section[dna_counter]
+            dna_counter = dna_counter + 1
+        return ''.join(dna)
+    return chromosome
 
 def randomBits(length):
     bits = ""
@@ -133,6 +149,7 @@ while True:
         for child in population:
             if child['won']:
                 found = True
+                console.println("Solution found!")
                 break
 
         temp = [None] * pop_size
@@ -160,11 +177,9 @@ while True:
 
     if found:
         replayBest(best_chromosome['dna'])
-        SUCCESSES += 1
         break
     #if input("Again? : ")[0].upper() == 'Y':
     attempt += 1
-    console.println("\tSuccesses: " + str(SUCCESSES))
     #else:
     #    break
 console.println("Saving successes")
