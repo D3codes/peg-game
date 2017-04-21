@@ -8,7 +8,7 @@ cross = 0.6
 mutation = 0.01
 pop_size = 100
 chromo_length = 416
-max_gens = 6000
+max_gens = 4000
 DISPLAY_WINDOW = False
 
 gens = 0
@@ -150,8 +150,8 @@ while True:
             population[i] = temp[i]
 
         gens += 1
-        if gens % 100 == 0:
-            console.println("Generation: " + str(gens))
+        if gens % 1000 == 0:
+            console.println("\tGeneration: " + str(gens))
         if gens > max_gens:
             console.println("\tNo solution found this run")
             console.println("\tMax fitness for this run: " + str(best_chromosome['fitness']) + '/' + str(MAX_FITNESS))
