@@ -19,7 +19,7 @@ def wonGame():
 
 def pegsRemaining():
     pegs = 0
-    for i in range(0,14):
+    for i in range(0,15):
         if board[i]:
             pegs+=1
     return pegs
@@ -138,7 +138,7 @@ def canMove(start, end):
         return False
     if end <0 or end > 14:
         return False
-        
+
     if not board[start] or board[end]:
         return False
     mid = middle(start, end)

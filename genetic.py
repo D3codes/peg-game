@@ -6,7 +6,7 @@ import window
 
 cross = 0.6
 mutation = 0.01
-pop_size = 96
+pop_size = 100
 chromo_length = 416
 max_gens = 6000
 DISPLAY_WINDOW = False
@@ -14,12 +14,9 @@ DISPLAY_WINDOW = False
 gens = 0
 gene_length = 4
 numberOfMoves = int(chromo_length/gene_length)
-MAX_FITNESS = 0
+MAX_FITNESS = 13
 SUCCESSES = 0
 successful_chromos = []
-
-for i in range(0, 13):
-    MAX_FITNESS += (numberOfMoves * numberOfMoves + 1) + (i * i)
 
 if DISPLAY_WINDOW:
     window.createWindow()
@@ -28,7 +25,7 @@ def saveSuccesses():
     target = open("successes.txt", 'a')
     target.truncate()
     for dna in successful_chromos:
-        target.write(str(dna))
+        target.write(str(dna) + '\n')
     target.close()
 
 def readSuccesses():
@@ -62,13 +59,13 @@ def fitness(population, bestChromo):
             middle = board.middle(start, end)
             didMove = board.move(start, end)
             if didMove:
-                population[i]['fitness'] += (numberOfMoves * numberOfMoves + 1) - (j * j)
-                if population[i]['fitness'] > bestChromo['fitness']:
-                    bestChromo = population[i]
                 if DISPLAY_WINDOW:
                     window.fillPeg(start)
                     window.fillPeg(end)
                     window.fillPeg(middle)
+        population[i]['fitness'] = MAX_FITNESS - (board.pegsRemaining() - 1)
+        if population[i]['fitness'] > bestChromo['fitness']:
+            bestChromo = population[i]
 
         if board.wonGame():
             population[i]['won'] = True
@@ -107,6 +104,9 @@ def mutate(dna):
         else:
             new_dna += bit
     return new_dna
+
+#def scramble(dna):
+
 
 def randomBits(length):
     bits = ""
@@ -150,6 +150,8 @@ while True:
             population[i] = temp[i]
 
         gens += 1
+        if gens % 100 == 0:
+            console.println("Generation: " + str(gens))
         if gens > max_gens:
             console.println("\tNo solution found this run")
             console.println("\tMax fitness for this run: " + str(best_chromosome['fitness']) + '/' + str(MAX_FITNESS))

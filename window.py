@@ -12,16 +12,6 @@ pegs = []
 labels = []
 texts = []
 
-win = GraphWin("Peg", 500, 350)
-for i in range(0, 15):
-    pt = Point(x_values[i], y_values[i])
-    pegs.append(Circle(pt, PEG_RADIUS))
-    labels.append(Text(pt, str(i)))
-    labels[i].setTextColor('white')
-    labels[i].setSize(20)
-for i in range(0, 15):
-    pegs[i].draw(win)
-
 def fillPeg(peg):
     if board.isOccupied(peg):
         pegs[peg].setFill('red')
@@ -41,3 +31,23 @@ def printText(text, pos):
     texts.append(Text(Point(pos['x'], pos['y']), text))
     texts[text].undraw()
     texts[text].draw(win)
+
+def drawWindow():
+    for i in range(0, 15):
+        pt = Point(x_values[i], y_values[i])
+        pegs.append(Circle(pt, PEG_RADIUS))
+        labels.append(Text(pt, str(i)))
+        labels[i].setTextColor('white')
+        labels[i].setSize(20)
+    vertices = [Point(250, 1), Point(95, 269), Point(405, 269)]
+    triangle = Polygon(vertices)
+    triangle.setFill('#966f33')
+    triangle.setOutline('black')
+    triangle.draw(win)
+    for i in range(0, 15):
+        pegs[i].setFill('black')
+        pegs[i].draw(win)
+        drawLabel(i)
+
+win = GraphWin("Peg", 500, 350)
+drawWindow()
